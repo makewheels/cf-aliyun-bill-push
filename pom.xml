@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.github.makewheels</groupId>
     <artifactId>cf-aliyun-bill-push</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <name>cf-aliyun-bill-push</name>
     <description>cf-aliyun-bill-push</description>
     <properties>

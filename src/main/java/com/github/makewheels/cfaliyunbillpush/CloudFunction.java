@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-
 public class CloudFunction implements StreamRequestHandler {
     private Client client;
 
