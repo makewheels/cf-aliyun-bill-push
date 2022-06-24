@@ -24,8 +24,8 @@ public class CloudFunction implements StreamRequestHandler {
             return client;
         }
         Config config = new Config()
-                .setAccessKeyId(Base64.decodeStr("TFRBSTV0TVFBVWdURzRHeTZjaHBjc2Zy"))
-                .setAccessKeySecret(Base64.decodeStr("MHlVWTE4M01qV0ZNbm41UGR2MWZrRFdORzNnQWk5"));
+                .setAccessKeyId(System.getenv("bill_accessKeyId"))
+                .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
         config.endpoint = "business.aliyuncs.com";
         try {
             client = new Client(config);
