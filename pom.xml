@@ -20,6 +20,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -37,6 +43,16 @@
             <groupId>com.aliyun.fc.runtime</groupId>
             <artifactId>fc-java-core</artifactId>
             <version>1.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>bssopenapi20171214</artifactId>
+            <version>1.7.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-bssopenapi</artifactId>
+            <version>1.7.14</version>
         </dependency>
 
         <dependency>
@@ -59,18 +75,18 @@
 
     <build>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>-->
-<!--                            <groupId>org.projectlombok</groupId>-->
-<!--                            <artifactId>lombok</artifactId>-->
-<!--                        </exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    <excludes>-->
+            <!--                        <exclude>-->
+            <!--                            <groupId>org.projectlombok</groupId>-->
+            <!--                            <artifactId>lombok</artifactId>-->
+            <!--                        </exclude>-->
+            <!--                    </excludes>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
 
             <plugin>
