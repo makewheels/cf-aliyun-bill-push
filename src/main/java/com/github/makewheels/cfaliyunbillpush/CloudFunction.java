@@ -27,11 +27,11 @@ public class CloudFunction implements StreamRequestHandler {
             return client;
         }
         Config config = new Config()
-//                .setAccessKeyId(System.getenv("bill_accessKeyId"))
-//                .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
+                .setAccessKeyId(System.getenv("bill_accessKeyId"))
+                .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
 
-                .setAccessKeyId("LTAI5tFcX3pgqLBmbNeMSk88")
-                .setAccessKeySecret("mTve9KUcY89m5L4GRvvdMeTpHq68yY");
+//                .setAccessKeyId("LTAI5tFcX3pgqLBmbNeMSk88")
+//                .setAccessKeySecret("mTve9KUcY89m5L4GRvvdMeTpHq68yY");
         config.endpoint = "business.aliyuncs.com";
         try {
             client = new Client(config);
