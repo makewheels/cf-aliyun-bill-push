@@ -138,7 +138,8 @@ public class CloudFunction implements StreamRequestHandler {
                 .forEach(e -> linkedHashMap.put(e.getKey(), e.getValue()));
         for (String key : linkedHashMap.keySet()) {
             Integer integer = linkedHashMap.get(key);
-            stringBuilder.append("<b>" + key + "</b>&nbsp;" + integer / 100.0 + ",&nbsp;");
+            stringBuilder.append("<font color=\"#FF0000\"><b>" + key + "</b></font>:&nbsp;"
+                    + integer / 100.0 + ",&nbsp;");
         }
         return stringBuilder.toString();
     }
