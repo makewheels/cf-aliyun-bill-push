@@ -12,6 +12,12 @@ import com.aliyun.fc.runtime.Context;
 import com.aliyun.fc.runtime.StreamRequestHandler;
 import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.bssopenapi.model.v20171214.QueryAccountBalanceRequest;
+import com.aliyuncs.bssopenapi.model.v20171214.QueryAccountBalanceResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.profile.DefaultProfile;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,9 +35,8 @@ public class CloudFunction implements StreamRequestHandler {
         Config config = new Config()
                 .setAccessKeyId(System.getenv("bill_accessKeyId"))
                 .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
-
-//                .setAccessKeyId("LTAI5tFcX3pgqLBmbNeMSk88")
-//                .setAccessKeySecret("mTve9KUcY89m5L4GRvvdMeTpHq68yY");
+//                .setAccessKeyId("")
+//                .setAccessKeySecret("");
         config.endpoint = "business.aliyuncs.com";
         try {
             client = new Client(config);
@@ -138,33 +143,51 @@ public class CloudFunction implements StreamRequestHandler {
                 .forEach(e -> linkedHashMap.put(e.getKey(), e.getValue()));
         for (String key : linkedHashMap.keySet()) {
             Integer integer = linkedHashMap.get(key);
-            stringBuilder.append("<font color=\"#FF0000\"><b>" + key + "</b></font>:&nbsp;"
+            stringBuilder.append("<font color=\"#0000FF\"><b>" + key + "</b></font>:&nbsp;"
                     + integer / 100.0 + ",&nbsp;");
         }
         return stringBuilder.toString();
     }
 
     /**
-     * 发邮件
-     *
-     * @param allDayCosts
-     * @param week
-     * @param month
+     * 获取账户余额
      */
-    private void sendEmail(List<DailyCost> allDayCosts, Map<String, Integer> week, Map<String, Integer> month) {
+    public int getBalance() {
+        DefaultProfile profile = DefaultProfile.getProfile("cn-beijing",
+                System.getenv("bill_accessKeyId"), System.getenv("bill_accessKeySecret"));
+        IAcsClient client = new DefaultAcsClient(profile);
+
+        QueryAccountBalanceRequest request = new QueryAccountBalanceRequest();
+        try {
+            QueryAccountBalanceResponse response = client.getAcsResponse(request);
+            return (int) (Double.parseDouble(response.getData().getAvailableAmount()) * 100);
+        } catch (ClientException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 发邮件
+     */
+    private void sendEmail(
+            int balance, List<DailyCost> allDayCosts,
+            Map<String, Integer> week, Map<String, Integer> month) {
         //组装发送邮件参数
+        double balanceInDouble = balance / 100.0;
         JSONObject body = new JSONObject();
         body.put("toAddress", "finalbird@foxmail.com");
-        body.put("fromAlias", "push-center");
-        body.put("subject", "阿里云消费");
+        body.put("fromAlias", "推送中心");
+        body.put("subject", "日报：阿里云 " + balanceInDouble);
         body.put("htmlBody", "yesterday:&nbsp;" + convertMapToHtml(allDayCosts.get(0).getMap()) + "<br>"
-                + "week:&nbsp;" + convertMapToHtml(week) + "<br>"
-                + "month:&nbsp;" + convertMapToHtml(month));
+                + "week:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + convertMapToHtml(week) + "<br>"
+                + "month:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + convertMapToHtml(month) + "<br>"
+                + "balance:&nbsp;" + balanceInDouble
+        );
         //调用推送中心
         String response = HttpUtil.post(
                 "http://push-center.java8.icu:5025/push/sendEmail",
                 body.toJSONString());
-        System.out.println(response);
+        System.out.println("发邮件结果：" + response);
     }
 
     @Override
@@ -179,10 +202,12 @@ public class CloudFunction implements StreamRequestHandler {
             mergeMaps(allDayCosts.get(i).getMap(), month);
         }
 
-        System.out.println(allDayCosts.get(0).getMap());
-        System.out.println(week);
-        System.out.println(month);
-        sendEmail(allDayCosts, week, month);
+        System.out.println("yesterday = " + allDayCosts.get(0).getMap());
+        System.out.println("week = " + week);
+        System.out.println("month = " + month);
+        int balance = getBalance();
+        System.out.println("balance = " + balance);
+        sendEmail(balance, allDayCosts, week, month);
     }
 
     public static void main(String[] args) {
