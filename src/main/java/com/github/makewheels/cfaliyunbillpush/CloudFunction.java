@@ -27,8 +27,11 @@ public class CloudFunction implements StreamRequestHandler {
             return client;
         }
         Config config = new Config()
-                .setAccessKeyId(System.getenv("bill_accessKeyId"))
-                .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
+//                .setAccessKeyId(System.getenv("bill_accessKeyId"))
+//                .setAccessKeySecret(System.getenv("bill_accessKeySecret"));
+
+                .setAccessKeyId("LTAI5tFcX3pgqLBmbNeMSk88")
+                .setAccessKeySecret("mTve9KUcY89m5L4GRvvdMeTpHq68yY");
         config.endpoint = "business.aliyuncs.com";
         try {
             client = new Client(config);
@@ -120,15 +123,42 @@ public class CloudFunction implements StreamRequestHandler {
         }
     }
 
+    /**
+     * 组装html需要的，可视化的，给人看的金额
+     *
+     * @param cost
+     * @return
+     */
+    private String convertMapToHtml(Map<String, Integer> cost) {
+        StringBuilder stringBuilder = new StringBuilder();
+        //排序
+        Map<String, Integer> linkedHashMap = new LinkedHashMap<>();
+        cost.entrySet().stream()
+                .sorted((o1, o2) -> o2.getValue() - o1.getValue())
+                .forEach(e -> linkedHashMap.put(e.getKey(), e.getValue()));
+        for (String key : linkedHashMap.keySet()) {
+            Integer integer = linkedHashMap.get(key);
+            stringBuilder.append(key + "&nbsp;" + integer / 100.0 + ",&nbsp;");
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 发邮件
+     *
+     * @param allDayCosts
+     * @param week
+     * @param month
+     */
     private void sendEmail(List<DailyCost> allDayCosts, Map<String, Integer> week, Map<String, Integer> month) {
         //组装发送邮件参数
         JSONObject body = new JSONObject();
         body.put("toAddress", "finalbird@foxmail.com");
         body.put("fromAlias", "push-center");
         body.put("subject", "阿里云消费");
-        body.put("htmlBody", "昨天：" + allDayCosts.get(0).getMap()
-                + JSON.toJSONString(week) + "<br>"
-                + JSON.toJSONString(month));
+        body.put("htmlBody", "yesterday:&nbsp;" + convertMapToHtml(allDayCosts.get(0).getMap()) + "<br>"
+                + "week:&nbsp;" + convertMapToHtml(week) + "<br>"
+                + "month:&nbsp;" + convertMapToHtml(month));
         //调用推送中心
         String response = HttpUtil.post(
                 "http://push-center.java8.icu:5025/push/sendEmail",
@@ -151,6 +181,7 @@ public class CloudFunction implements StreamRequestHandler {
         System.out.println(allDayCosts.get(0).getMap());
         System.out.println(week);
         System.out.println(month);
+        sendEmail(allDayCosts, week, month);
     }
 
     public static void main(String[] args) {
