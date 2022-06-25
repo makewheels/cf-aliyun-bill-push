@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CloudFunction implements StreamRequestHandler {
     private Client client;
@@ -141,10 +142,15 @@ public class CloudFunction implements StreamRequestHandler {
         cost.entrySet().stream()
                 .sorted((o1, o2) -> o2.getValue() - o1.getValue())
                 .forEach(e -> linkedHashMap.put(e.getKey(), e.getValue()));
-        for (String key : linkedHashMap.keySet()) {
+        List<String> keys = new ArrayList<>(linkedHashMap.keySet());
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
             Integer integer = linkedHashMap.get(key);
             stringBuilder.append("<font color=\"#0000FF\"><b>" + key + "</b></font>:&nbsp;"
-                    + integer / 100.0 + ",&nbsp;");
+                    + integer / 100.0);
+            if (i != keys.size() - 1) {
+                stringBuilder.append(",&nbsp;");
+            }
         }
         return stringBuilder.toString();
     }
