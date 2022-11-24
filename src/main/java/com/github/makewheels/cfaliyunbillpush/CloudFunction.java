@@ -52,7 +52,6 @@ public class CloudFunction implements StreamRequestHandler {
      */
     private QueryAccountTransactionsResponseBody request(
             String createTimeStart, String createTimeEnd, int pageNum) throws Exception {
-        //发起请求
         QueryAccountTransactionsRequest request = new QueryAccountTransactionsRequest()
                 .setPageNum(pageNum)
                 .setPageSize(50)
@@ -191,7 +190,7 @@ public class CloudFunction implements StreamRequestHandler {
         );
         //调用推送中心
         String response = HttpUtil.post(
-                "http://push-center.java8.icu:5025/push/sendEmail",
+                "http://micorservice.pushcenter.cc:5025/push/sendEmail",
                 body.toJSONString());
         System.out.println("发邮件结果：" + response);
     }
